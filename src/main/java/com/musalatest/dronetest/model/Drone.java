@@ -39,4 +39,60 @@ public class Drone {
     @OneToOne
     @JoinColumn(name = "load_id")
     private Load currentLoad;
+
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    public Model getModel() {
+        return model;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
+    }
+
+    public int getWeightLimit() {
+        return weightLimit;
+    }
+
+    public void setWeightLimit(int weightLimit) {
+        this.weightLimit = weightLimit;
+    }
+
+    public int getBatteryCapacity() {
+        return batteryCapacity;
+    }
+
+    public void setBatteryCapacity(int batteryCapacity) {
+        this.batteryCapacity = batteryCapacity;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public Load getCurrentLoad() {
+        return currentLoad;
+    }
+
+    public void setCurrentLoad(Load currentLoad) {
+        this.currentLoad = currentLoad;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }

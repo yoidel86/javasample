@@ -1,0 +1,110 @@
+openapi: "3.0.0"
+info:
+  title: Drone API
+  description: 'The Drone REST API . Please see http://127.0.0.1:8080/docs/api for more details.'
+  version: v1
+  contact:
+    name: Demo API Support
+    url: 'http://github.com/yoidel86/demoApplication'
+    email: yoidel86@gmail.com
+servers:
+  - url: 'http://127.0.0.1:8080/v1'
+    description: localhost API server
+paths:
+  /drones:
+    get:
+      summary: List all drones
+      operationId: listDrones
+      tags:
+        - drones
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Drones'
+    post:
+      summary: Create a drone
+      operationId: createDrone
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Drone'
+  /drones/{droneId}:
+    get:
+      summary: Info for a specific drone
+      operationId: showDroneById
+      parameters:
+        - name: droneId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: droneId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Drone'
+components:
+  schemas:
+    Model:
+      type: string
+      enum:
+        - Lightweight
+        - Middleweight
+        - Cruiserweight
+        - Heavyweight
+    State:
+      type: string
+      enum:
+        - IDLE
+        - LOADING
+        - LOADED
+        - DELIVERING
+        - DELIVERED
+        - RETURNING
+    Drone:
+      type: object
+      required:
+        - id
+        - serialNumber
+
+      properties:
+        id:
+          type: integer
+          format: int64
+        serialNumber:
+          type: string
+        model:
+          type: string
+
+        weightLimit:
+          type: number
+        batteryCapacity:
+          type: number
+        state:
+          type: string
+    Drones:
+      type: array
+      items:
+        $ref: '#/components/schemas/Drone'
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
