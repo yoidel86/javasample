@@ -16,7 +16,7 @@ public interface DroneMapper {
     List<DroneDto> toDtos(final List<Drone> drones);
 
     @InheritInverseConfiguration
-    Drone DroneDtoToDrone( final DroneDto droneDto);
+    Drone droneDtoToDrone( final DroneDto droneDto);
 
 }
 

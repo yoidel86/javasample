@@ -15,6 +15,12 @@ paths:
     get:
       summary: List all drones
       operationId: listDrones
+      parameters:
+        - name: status #checking available drones for loading;
+          in: query
+          schema:
+            type: string
+            description: status
       tags:
         - drones
       responses:
@@ -24,7 +30,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Drones'
-    post:
+    post: #- registering a drone;
       summary: Create a drone
       operationId: createDrone
       responses:
@@ -35,7 +41,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Drone'
   /drones/{droneId}:
-    get:
+    get: #- checking loaded medication items for a given drone;
       summary: Info for a specific drone
       operationId: showDroneById
       parameters:
@@ -45,7 +51,7 @@ paths:
           style: simple
           explode: false
           schema:
-            type: string
+            type: integer
             description: droneId
       responses:
         '200':
@@ -54,6 +60,113 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Drone'
+  /drones/{droneId}/medications:
+    get: #- get loaded medications;
+      summary: checking loaded medication items for a given drone;
+      operationId: getDroneLoadedMedicationsById
+      parameters:
+        - name: droneId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            description: droneId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medications'
+  /drones/{droneId}/batery-level:
+    get: #- check drone battery level for a given drone;
+      summary: check drone battery level for a given drone;
+      operationId: getDroneBateryLevelById
+      parameters:
+        - name: droneId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            description: droneId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medications'
+  /medications:
+    get:
+      summary: List all medications
+      operationId: listMedications
+      tags:
+        - medications
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medications'
+    post:
+      summary: Create a Medication
+      operationId: createMedication
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medication'
+  /medications/{medicationId}:
+    get:
+      summary: Info for a specific Medication
+      operationId: showMedicationById
+      parameters:
+        - name: medicationId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: medicationId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Drone'
+  /loads:
+    get:
+      summary: List all Loads
+      operationId: listLoads
+      tags:
+        - loads
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loads'
+
+    post: #loading a drone with medication items;
+      summary: Create a Load
+      operationId: createLoad
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Load'
 components:
   schemas:
     Model:
@@ -81,22 +194,54 @@ components:
       properties:
         id:
           type: integer
-          format: int64
         serialNumber:
           type: string
         model:
           type: string
 
         weightLimit:
-          type: number
+          type: integer
         batteryCapacity:
-          type: number
+          type: integer
         state:
           type: string
     Drones:
       type: array
       items:
         $ref: '#/components/schemas/Drone'
+    Medication:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        code:
+          type: string
+        weight:
+          type: integer
+        image:
+          type: string
+    Medications:
+      type: array
+      items:
+        $ref: '#/components/schemas/Medication'
+    Load:
+      type: object
+      properties:
+        id:
+          type: integer
+        drone_id:
+          type: integer
+        medications_id:
+          type: array
+          items:
+            type: integer
+    Loads:
+      type: array
+      items:
+        $ref: '#/components/schemas/Load'
+
     Error:
       type: object
       required:
