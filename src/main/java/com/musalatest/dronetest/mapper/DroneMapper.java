@@ -10,8 +10,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface DroneMapper {
 
-
-    DroneDto toDto(final Drone drone);
+     DroneDto toDto(final Drone drone);
 
     List<DroneDto> toDtos(final List<Drone> drones);
 

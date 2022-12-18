@@ -16,7 +16,7 @@ public class TestFactory {
  private static final Integer BATTERY_CAPACITY = 20;
  private static final Integer ID = 35;
  private static final Integer WEIGHT_LIMIT = 350;
- private static String MODEL = String.valueOf(Model.Lightweight);
+ private static Model MODEL = Model.LIGHTWEIGHT;
 
 
  public static Drone getDrone() {
@@ -28,7 +28,7 @@ public class TestFactory {
   drone.setSerialNumber(SERIAL_NUMBER);
   drone.setBatteryCapacity(BATTERY_CAPACITY);
   drone.setWeightLimit(WEIGHT_LIMIT);
-  drone.setModel(Model.valueOf(MODEL));
+  drone.setModel(MODEL);
   return drone;
  }
 

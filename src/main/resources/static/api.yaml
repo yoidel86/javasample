@@ -33,6 +33,12 @@ paths:
     post: #- registering a drone;
       summary: Create a drone
       operationId: createDrone
+      requestBody:
+        description: 'Drone properties'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Drone'
       responses:
         '200':
           description: OK
@@ -80,6 +86,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Medications'
+        '404':
+          description: A drone with the specified ID was not found.
   /drones/{droneId}/batery-level:
     get: #- check drone battery level for a given drone;
       summary: check drone battery level for a given drone;
@@ -97,9 +105,43 @@ paths:
         '200':
           description: OK
           content:
+            text/plain:
+              schema:
+                type: string
+                example: 20%
+        '404':
+          description: A drone with the specified ID was not found.
+  /drones/{droneId}/load/{loadId}:
+    post: #- check drone battery level for a given drone;
+      summary: Try to asign a Drone To a Load ;
+      operationId: setDroneToLoad
+      parameters:
+        - name: droneId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            description: droneId
+        - name: loadId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            description: loadId of a pre-registered list of medications to be delivered
+
+      responses:
+        '200':
+          description: OK
+          content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Medications'
+                $ref: '#/components/schemas/DroneLoadedResponse'
+        '404':
+          description: A Drone or a Load with the specified ID was not found.
   /medications:
     get:
       summary: List all medications
@@ -116,6 +158,12 @@ paths:
     post:
       summary: Create a Medication
       operationId: createMedication
+      requestBody:
+        description: 'Medication properties'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Medication'
       responses:
         '200':
           description: OK
@@ -160,6 +208,12 @@ paths:
     post: #loading a drone with medication items;
       summary: Create a Load
       operationId: createLoad
+      requestBody:
+        description: 'Load properties'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Load'
       responses:
         '200':
           description: OK
@@ -188,23 +242,26 @@ components:
     Drone:
       type: object
       required:
-        - id
         - serialNumber
-
       properties:
         id:
           type: integer
         serialNumber:
           type: string
+          maxLength: 100
         model:
           type: string
-
+          enum: ["LIGHTWEIGHT", "MIDDLEWEIGHT", "CRUISERWEIGHT", "HEAVYWEIGHT"]
         weightLimit:
           type: integer
+          maximum: 500
         batteryCapacity:
           type: integer
+          minimum: 0
+          maximum: 100
         state:
           type: string
+          enum: ["IDLE", "LOADING", "LOADED", "DELIVERING", "DELIVERED", "RETURNING"]
     Drones:
       type: array
       items:
@@ -216,10 +273,13 @@ components:
           type: integer
         name:
           type: string
+          pattern: '^[[:alnum:]_-]+$'
         code:
           type: string
+          pattern: '^[A-Z_0-9\-]+$'
         weight:
           type: integer
+          maximum: 500
         image:
           type: string
     Medications:
@@ -241,6 +301,15 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Load'
+    DroneLoadedResponse:
+      type: object
+      properties:
+        drone:
+          type: object
+          $ref: '#/components/schemas/Drone'
+        load:
+          type: object
+          $ref: '#/components/schemas/Load'
 
     Error:
       type: object

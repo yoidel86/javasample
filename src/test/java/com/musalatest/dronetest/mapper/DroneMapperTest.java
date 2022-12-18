@@ -22,6 +22,8 @@ class DroneMapperTest {
     void toDto() {
         Drone drone = TestFactory.getDrone();
         DroneDto dto = droneMapper.toDto(drone);
+        System.out.println(dto);
+        System.out.println(dto.getId());
         assertTrue(dto.getId()==drone.getId());
         assertTrue(Objects.equals(dto.getSerialNumber(), drone.getSerialNumber()));
         assertTrue(dto.getBatteryCapacity()==drone.getBatteryCapacity());
@@ -31,7 +33,7 @@ class DroneMapperTest {
     void toDtoModelEnum() {
         Drone drone = TestFactory.getDrone();
         DroneDto dto = droneMapper.toDto(drone);
-        assertTrue(Objects.equals(dto.getModel(), String.valueOf(drone.getModel())));
+        assertTrue(Objects.equals(dto.getModel().getValue(), String.valueOf(drone.getModel())));
     }
 
     @Test
@@ -52,7 +54,7 @@ class DroneMapperTest {
         Drone drone = TestFactory.getDrone();
         DroneDto dto = droneMapper.toDto(drone);
         Drone droneReversed = droneMapper.droneDtoToDrone(dto);
-
+        System.out.println();
         assertTrue(droneReversed.getId()==drone.getId());
         assertTrue(Objects.equals(droneReversed.getSerialNumber(), drone.getSerialNumber()));
         assertTrue(droneReversed.getBatteryCapacity()==drone.getBatteryCapacity());
