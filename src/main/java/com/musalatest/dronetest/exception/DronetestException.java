@@ -2,6 +2,7 @@ package com.musalatest.dronetest.exception;
 
 import org.springframework.http.HttpStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DronetestException extends RuntimeException {
@@ -18,10 +19,13 @@ public class DronetestException extends RuntimeException {
         this.httpStatus=httpStatus;
         this.message=message;
     }
-    public DronetestException(HttpStatus httpStatus, String message, List<ApiSubError> subErrors){
+    public DronetestException(HttpStatus httpStatus, String message, List<String> subErrors){
         this.httpStatus=httpStatus;
         this.message=message;
-        this.subErrors=subErrors;
+        this.subErrors = new ArrayList<ApiSubError>();
+        for (String error: subErrors) {
+            this.subErrors.add(new ApiSubError(HttpStatus.BAD_REQUEST,error));
+        }
     }
     public String getMessage() {
         return this.message;

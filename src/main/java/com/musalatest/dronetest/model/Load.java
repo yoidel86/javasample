@@ -1,8 +1,16 @@
 package com.musalatest.dronetest.model;
 
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import java.util.List;
+
+import static javax.persistence.FetchType.EAGER;
 
 @Entity
 public class Load {
@@ -15,7 +23,7 @@ public class Load {
     @JoinColumn(name = "drone_id")
     private Drone drone;
 
-    @ManyToMany(mappedBy = "loaded")
+    @ManyToMany(fetch=EAGER)
     private List<Medication> medications;
 
 
@@ -41,5 +49,14 @@ public class Load {
 
     public void setMedications(List<Medication> medications) {
         this.medications = medications;
+    }
+
+    public Integer getTotalWeight(){
+        int total_weight = 0;
+        for (Medication medication :
+                this.getMedications()) {
+            total_weight += medication.getWeight();
+        }
+        return total_weight;
     }
 }

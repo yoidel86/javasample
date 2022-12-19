@@ -21,3 +21,7 @@ spring:
 springdoc:
   swagger-ui:
     path=/swagger-ui.html:
+validations:
+  min-battery-level: 25
+  batery:
+    min: 25

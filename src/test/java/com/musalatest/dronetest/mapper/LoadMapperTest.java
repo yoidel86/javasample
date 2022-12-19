@@ -21,7 +21,7 @@ class LoadMapperTest {
 
     @Test
     void toDto() {
-        Load load = TestFactory.getLoad();
+        Load load = TestFactory.getLoadedLoad(1);
         LoadDto dto = loadMapper.toDto(load);
 
         assertTrue(dto.getId()==load.getId());

@@ -4,6 +4,7 @@ import com.musalatest.dronetest.model.Drone;
 import com.musalatest.dronetest.model.Load;
 import com.musalatest.dronetest.model.Medication;
 import com.musalatest.dronetest.model.types.Model;
+import com.musalatest.dronetest.model.types.State;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +23,35 @@ public class TestFactory {
  public static Drone getDrone() {
   return getDrone(ID);
  }
+
  public static Drone getDrone(int id){
+  final Drone drone = new Drone();
+  drone.setId(id);
+  drone.setSerialNumber(SERIAL_NUMBER);
+  drone.setBatteryCapacity(50);
+  drone.setWeightLimit(WEIGHT_LIMIT);
+  drone.setModel(MODEL);
+  drone.setState(State.IDLE);
+  return drone;
+ }
+ public static Drone getDroneDelivering(int id){
   final Drone drone = new Drone();
   drone.setId(id);
   drone.setSerialNumber(SERIAL_NUMBER);
   drone.setBatteryCapacity(BATTERY_CAPACITY);
   drone.setWeightLimit(WEIGHT_LIMIT);
   drone.setModel(MODEL);
+  drone.setState(State.DELIVERING);
+  return drone;
+ }
+ public static Drone getDroneLowBatery(int id){
+  final Drone drone = new Drone();
+  drone.setId(id);
+  drone.setSerialNumber(SERIAL_NUMBER);
+  drone.setBatteryCapacity(20);
+  drone.setWeightLimit(WEIGHT_LIMIT);
+  drone.setModel(MODEL);
+  drone.setState(State.IDLE);
   return drone;
  }
 
@@ -51,12 +74,20 @@ public class TestFactory {
  public static Load getLoad(int id){
   Load load = new Load();
   load.setId(id);
+  List<Medication> medications = new ArrayList<>();
+  medications.add(TestFactory.getMedication(1));
+  medications.add(TestFactory.getMedication(2));
+  load.setMedications(medications);
+  return load;
+ }
+ public static Load getLoadedLoad(int id){
+  Load load = new Load();
+  load.setId(id);
   load.setDrone(getDrone());
   List<Medication> medications = new ArrayList<>();
   medications.add(TestFactory.getMedication(1));
   medications.add(TestFactory.getMedication(2));
   load.setMedications(medications);
   return load;
-
  }
 }

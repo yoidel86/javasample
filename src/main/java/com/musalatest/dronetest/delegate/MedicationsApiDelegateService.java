@@ -26,5 +26,11 @@ public class MedicationsApiDelegateService implements MedicationsApiDelegate {
         List<MedicationDto> result = medicationMapper.toDtos(medications);
         return ResponseEntity.ok(result);
     }
+    public ResponseEntity<MedicationDto> createMedication(MedicationDto medicationDto) {
+        Medication medication = medicationMapper.medicationDtoToMedication(medicationDto);
+        medication = medicationRepository.save(medication);
+        MedicationDto result = medicationMapper.toDto(medication);
+        return ResponseEntity.ok(result);
+    }
 
 }

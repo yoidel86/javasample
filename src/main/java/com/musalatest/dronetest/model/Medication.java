@@ -29,8 +29,8 @@ public class Medication {
     @Column
     private String image;
 
-    @ManyToMany
-    private List<Load> loaded;
+    @ManyToMany(mappedBy = "medications")
+    private List<Load> loads;
 
     public Integer getId() {
         return id;
@@ -72,11 +72,11 @@ public class Medication {
         this.image = image;
     }
 
-    public List<Load> getLoaded() {
-        return loaded;
+    public List<Load> getLoads() {
+        return loads;
     }
 
-    public void setLoaded(List<Load> loaded) {
-        this.loaded = loaded;
+    public void setLoads(List<Load> loads) {
+        this.loads = loads;
     }
 }

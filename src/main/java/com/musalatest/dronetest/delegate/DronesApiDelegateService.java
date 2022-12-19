@@ -8,8 +8,11 @@ import com.musalatest.dronetest.mapper.DroneMapper;
 import com.musalatest.dronetest.mapper.LoadMapper;
 import com.musalatest.dronetest.mapper.MedicationMapper;
 import com.musalatest.dronetest.model.*;
+import com.musalatest.dronetest.model.types.State;
 import com.musalatest.dronetest.repository.DroneRepository;
 import com.musalatest.dronetest.repository.LoadRepository;
+import com.musalatest.dronetest.validator.Validator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,17 +25,23 @@ public class DronesApiDelegateService implements DronesApiDelegate {
     final LoadRepository loadRepository;
     final DroneMapper droneMapper;
     final MedicationMapper medicationMapper;
+
+    final Validator validator;
     final LoadMapper loadMapper;
 
-    public DronesApiDelegateService(DroneRepository droneRepository, LoadRepository loadRepository, DroneMapper droneMapper, MedicationMapper medicationMapper, LoadMapper loadMapper) {
+    @Value("${validations.battery.min}")
+    long min_battery_level;
+
+    public DronesApiDelegateService(DroneRepository droneRepository, LoadRepository loadRepository, DroneMapper droneMapper, MedicationMapper medicationMapper, Validator validator, LoadMapper loadMapper) {
         this.droneRepository = droneRepository;
         this.loadRepository = loadRepository;
         this.droneMapper = droneMapper;
         this.medicationMapper = medicationMapper;
+        this.validator = validator;
         this.loadMapper = loadMapper;
     }
 
-    public ResponseEntity<List<DroneDto>> listDrones() {
+    public ResponseEntity<List<DroneDto>> listDrones(String state) {
         List<Drone> drones = droneRepository.findAll();
         List<DroneDto> result = droneMapper.toDtos(drones);
         return ResponseEntity.ok(result);
@@ -51,10 +60,12 @@ public class DronesApiDelegateService implements DronesApiDelegate {
         return ResponseEntity.ok(result);
     }
 
-    public ResponseEntity<String> getDroneBateryLevelById(Integer droneId) {
+    public ResponseEntity<InlineResponse200Dto> getDroneBateryLevelById(Integer droneId) {
         Drone drone = droneRepository.findById(droneId)
                 .orElseThrow(() -> new EntityNotFoundException(Drone.class, ImmutableMap.of("droneId",droneId)));
-        return ResponseEntity.ok(String.format("%d %s",drone.getBatteryCapacity(),"%"));
+        InlineResponse200Dto response = new InlineResponse200Dto();
+        response.setBattery(drone.getBatteryCapacity());
+        return ResponseEntity.ok(response);
     }
 
     public  ResponseEntity<List<MedicationDto>> getDroneLoadedMedicationsById(Integer droneId) {
@@ -70,13 +81,25 @@ public class DronesApiDelegateService implements DronesApiDelegate {
 
     public ResponseEntity<DroneLoadedResponseDto> setDroneToLoad(Integer droneId,
                                                           Integer loadId){
+        System.out.println(min_battery_level);
+
         Drone drone = droneRepository.findById(droneId)
                 .orElseThrow(() -> new EntityNotFoundException(Drone.class, ImmutableMap.of("droneId",droneId)));
         Load load = loadRepository.findById(loadId)
                 .orElseThrow(() -> new EntityNotFoundException(Load.class, ImmutableMap.of("loadId",loadId)));
-        //@Todo Implements validations
+        List<String> errors = validator.isValid(load);
+        if (!errors.isEmpty()) {
+            throw new DronetestException(HttpStatus.BAD_REQUEST,"INVALID LOAD",errors);
+        }
+        errors = validator.isValidForLoad(drone,load.getTotalWeight());
+        if (!errors.isEmpty()){
+            throw new DronetestException(HttpStatus.BAD_REQUEST,"INVALID DRONE",errors);
+        }
         drone.setCurrentLoad(load);
-        droneRepository.save(drone);
+        drone.setState(State.LOADING);
+        drone = droneRepository.save(drone);
+        load.setDrone(drone);
+        load = loadRepository.save(load);
         DroneLoadedResponseDto result = new DroneLoadedResponseDto();
         result.setDrone(droneMapper.toDto(drone));
         result.setLoad(loadMapper.toDto(load));

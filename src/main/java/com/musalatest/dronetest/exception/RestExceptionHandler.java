@@ -32,14 +32,15 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
 	/**
-	 * Handle CuruException
+	 * Handle Exception DronetestException
 	 *
 	 * @return the ApiError object
 	 */
 	@ExceptionHandler(DronetestException.class)
-	protected ResponseEntity<Object> handleCuruException(DronetestException ex) {
+	protected ResponseEntity<Object> handleDronetestException(DronetestException ex) {
 		ApiError apiError = new ApiError(ex.getHttpStatus());
 		apiError.setMessage(ex.getMessage());
+		apiError.setSubErrors(ex.getSubErrors());
 		log.error(ex.getMessage());
 		return buildResponseEntity(apiError);
 	}
@@ -133,7 +134,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 		ApiError apiError = new ApiError(BAD_REQUEST);
-		apiError.setMessage("Validation error");
+		apiError.setMessage("Validation error argument");
 		apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
 		apiError.addValidationError(ex.getBindingResult().getGlobalErrors());
 		log.error(ex.getMessage());
