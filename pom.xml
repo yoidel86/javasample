@@ -128,6 +128,9 @@
 							<configOptions>
 								<delegatePattern>true</delegatePattern>
 							</configOptions>
+							<importMappings>
+								Pageable=org.springframework.data.domain.Pageable
+							</importMappings>
 						</configuration>
 					</execution>
 				</executions>

@@ -11,15 +11,19 @@ import com.musalatest.dronetest.model.*;
 import com.musalatest.dronetest.model.types.State;
 import com.musalatest.dronetest.repository.DroneRepository;
 import com.musalatest.dronetest.repository.LoadRepository;
+import com.musalatest.dronetest.util.Utils;
 import com.musalatest.dronetest.validator.Validator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
+@Slf4j
 public class DronesApiDelegateService implements DronesApiDelegate {
     final DroneRepository droneRepository;
     final LoadRepository loadRepository;
@@ -42,18 +46,41 @@ public class DronesApiDelegateService implements DronesApiDelegate {
     }
 
     public ResponseEntity<List<DroneDto>> listDrones(String state) {
-        List<Drone> drones = droneRepository.findAll();
+
+        List<Drone> drones;
+        if(Objects.isNull(state)){
+            log.info("getting all drones");
+          drones = droneRepository.findAll();
+        }else{
+            log.info("getting drones by state " + state);
+            drones = droneRepository.findByState(State.valueOf(state));
+        }
         List<DroneDto> result = droneMapper.toDtos(drones);
         return ResponseEntity.ok(result);
     }
 
     public ResponseEntity<DroneDto> createDrone(DroneDto droneDto) {
+        log.info("creating new drone");
        Drone drone = droneMapper.droneDtoToDrone(droneDto);
        drone = droneRepository.save(drone);
        DroneDto result = droneMapper.toDto(drone);
        return ResponseEntity.ok(result);
     }
+
+    public  ResponseEntity<DroneDto> updateDrone(Integer droneId,
+                                                 DroneDto droneDto) {
+        log.info("updating drone "+droneId);
+        Drone oldDrone = droneRepository.findById(droneId)
+                .orElseThrow(() -> new EntityNotFoundException(Drone.class, ImmutableMap.of("droneId",droneId)));
+        Drone drone = droneMapper.droneDtoToDrone(droneDto);
+        Utils.copyNonNullProperties(drone,oldDrone);
+        oldDrone = droneRepository.save(oldDrone);
+        DroneDto result = droneMapper.toDto(oldDrone);
+        return ResponseEntity.ok(result);
+    }
+
     public ResponseEntity<DroneDto> showDroneById(Integer droneId) {
+        log.info("showing drone "+droneId);
         Drone drone = droneRepository.findById(droneId)
                 .orElseThrow(() -> new EntityNotFoundException(Drone.class, ImmutableMap.of("droneId",droneId)));
         DroneDto result = droneMapper.toDto(drone);
@@ -61,6 +88,7 @@ public class DronesApiDelegateService implements DronesApiDelegate {
     }
 
     public ResponseEntity<InlineResponse200Dto> getDroneBateryLevelById(Integer droneId) {
+        log.info("geting battery level of drone "+droneId);
         Drone drone = droneRepository.findById(droneId)
                 .orElseThrow(() -> new EntityNotFoundException(Drone.class, ImmutableMap.of("droneId",droneId)));
         InlineResponse200Dto response = new InlineResponse200Dto();
@@ -69,10 +97,12 @@ public class DronesApiDelegateService implements DronesApiDelegate {
     }
 
     public  ResponseEntity<List<MedicationDto>> getDroneLoadedMedicationsById(Integer droneId) {
+        log.info("geting medications loaded on drone "+droneId);
         Drone drone = droneRepository.findById(droneId)
                 .orElseThrow(() -> new EntityNotFoundException(Drone.class, ImmutableMap.of("droneId",droneId)));
         Load load = drone.getCurrentLoad();
         if(load==null){
+            log.error("Drone is not loaded");
             throw new DronetestException(HttpStatus.NOT_FOUND,"Drone is not loaded");
         }
         List<MedicationDto> medicationDtos = medicationMapper.toDtos(load.getMedications());
@@ -81,6 +111,7 @@ public class DronesApiDelegateService implements DronesApiDelegate {
 
     public ResponseEntity<DroneLoadedResponseDto> setDroneToLoad(Integer droneId,
                                                           Integer loadId){
+        log.info("set load to drone "+droneId);
         System.out.println(min_battery_level);
 
         Drone drone = droneRepository.findById(droneId)

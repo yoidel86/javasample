@@ -21,10 +21,10 @@ public enum DroneValidator {
             return "";
         }
     },
-    BATERY() {
+    BATTERY() {
         public String validateForLoad(Drone obj,int min_battery_level,int max_weight){
             if (obj.getBatteryCapacity()<min_battery_level) {
-                return "the batery level should be > "+min_battery_level;
+                return "the battery level should be > "+min_battery_level;
             }
             return "";
         }

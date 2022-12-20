@@ -2,7 +2,8 @@ create table drone (id integer not null AUTO_INCREMENT,battery_capacity integer,
 create table load (id integer not null AUTO_INCREMENT, drone_id integer, primary key (id));
 create table medication (id integer not null AUTO_INCREMENT, code varchar(255), image varchar(255), name varchar(255), weight integer, primary key (id));
 create table load_medications (medications_id integer not null, loads_id integer not null);
-create sequence hibernate_sequence start with 1 increment by 1;
+create table checks (id integer not null AUTO_INCREMENT,description varchar(255) not null, date DATETIME, primary key (id));
+create sequence hibernate_sequence start with 3 increment by 1;
 alter table drone add constraint FKfd1s4ye1okw2o4hx0w20noh49 foreign key (load_id) references load;
 alter table load add constraint FK8e61bb9jj7ovkn3w7g8y4oa5u foreign key (drone_id) references drone;
 alter table load_medications add constraint FK60li9kkcb3e1ne35ttr999kud foreign key (loads_id) references load;

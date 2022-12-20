@@ -9,6 +9,7 @@ import com.musalatest.dronetest.model.LoadDto;
 import com.musalatest.dronetest.model.Medication;
 import com.musalatest.dronetest.repository.LoadRepository;
 import com.musalatest.dronetest.repository.MedicationRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class LoadsApiDelegateService implements LoadsApiDelegate {
     final LoadRepository loadRepository;
     final MedicationRepository medicationRepository;
@@ -28,12 +30,14 @@ public class LoadsApiDelegateService implements LoadsApiDelegate {
     }
 
     public ResponseEntity<List<LoadDto>> listLoads() {
+        log.info("getting all loads");
         List<Load> loads =  loadRepository.findAll();
         List<LoadDto> result = loadMapper.toDtos(loads);
         return ResponseEntity.ok(result);
     }
 
     public ResponseEntity<LoadDto> createLoad(LoadDto loadDto) {
+        log.info("creating a load");
         Load load = loadMapper.loadDtoToLoad(loadDto);
         //if this load don't use drone yet set it to null
         if(load.getDrone().getId()==null){
@@ -49,7 +53,5 @@ public class LoadsApiDelegateService implements LoadsApiDelegate {
         load = loadRepository.save(load);//save relation with medications
         LoadDto result = loadMapper.toDto(load);
         return ResponseEntity.ok(result);
-
-
     }
 }

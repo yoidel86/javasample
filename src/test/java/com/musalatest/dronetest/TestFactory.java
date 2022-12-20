@@ -54,6 +54,16 @@ public class TestFactory {
   drone.setState(State.IDLE);
   return drone;
  }
+ public static Drone getDroneBadWeight(int id){
+  final Drone drone = new Drone();
+  drone.setId(id);
+  drone.setSerialNumber(SERIAL_NUMBER);
+  drone.setBatteryCapacity(20);
+  drone.setWeightLimit(900);
+  drone.setModel(MODEL);
+  drone.setState(State.IDLE);
+  return drone;
+ }
 
  public static Medication getMedication() {
   return getMedication(1);
